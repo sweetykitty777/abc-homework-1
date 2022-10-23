@@ -29,6 +29,7 @@ int main(int argc, char** argv) {
         if (arr[i] != minimal) {
             ans[ans_size] = arr[i];
             printf("%d", arr[i]);
+            printf("\n");
             ans_size++;
         }
     }

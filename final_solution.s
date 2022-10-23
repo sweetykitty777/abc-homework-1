@@ -1,43 +1,47 @@
-	.intel_syntax noprefix
-	.text
-	.globl	find_min
-	.type	find_min, @function
+#r12d = -4[rbp]
+#r13d = -8[rbp]
+#r14d = -28[rbp]
+#r15d = 
+.intel_syntax noprefix
+    .text
+    .globl    find_min
+    .type    find_min, @function
 find_min:
         endbr64 #we came here from some branch (that was said by our assistant)
         push    rbp #save rbp on stack
         mov     rbp, rsp #rbp:=rsp
         mov     QWORD PTR -24[rbp], rdi #-24[rbp]:= first arg (arr)
-        mov     DWORD PTR -28[rbp], esi # -28[rbp] = second arg (n)
+        mov     r14d, esi # -28[rbp]:= second arg (n)
         mov     rax, QWORD PTR -24[rbp] #arr
         mov     eax, DWORD PTR [rax] # arr[0]
-        mov     DWORD PTR -4[rbp], eax # minimal: = arr[0]
-        mov     DWORD PTR -8[rbp], 1 # i = 1
+        mov     r12d, eax # minimal: = arr[0]
+        mov     r13d, 1 # i = 1
         jmp    .L2 #go to loop condition
 
 .L4:
-    mov    eax, DWORD PTR -8[rbp] #eax:=i
+    mov    eax, r13d #eax:=i
     cdqe
-    lea    rdx, 0[0+rax*4] 
+    lea    rdx, 0[0+rax*4]
     mov    rax, QWORD PTR -24[rbp] #arr
     add    rax, rdx
     mov    eax, DWORD PTR [rax]
-    cmp    DWORD PTR -4[rbp], eax #compare minimal and arr[i]
+    cmp    r12d, eax #compare minimal and arr[i]
     jle    .L3  #if minimal <= arr[i] don't go to the if body, just next loop
-    mov    eax, DWORD PTR -8[rbp]
+    mov    eax, r13d
     cdqe
-    lea    rdx, 0[0+rax*4] 
+    lea    rdx, 0[0+rax*4]
     mov    rax, QWORD PTR -24[rbp] #arr
     add    rax, rdx
     mov    eax, DWORD PTR [rax] #arr[i]
-    mov    DWORD PTR -4[rbp], eax #minimal = arr[i]
+    mov    r12d, eax #minimal = arr[i]
 
 .L3:
-    add	   DWORD PTR -8[rbp], 1 #i++
+    add       r13d, 1 #i++
 .L2:
-    mov    eax, DWORD PTR -8[rbp] # eax:= i
-    cmp    eax, DWORD PTR -28[rbp] # compare i and n
+    mov    eax, r13d # eax:= i
+    cmp    eax, r14d # compare i and n
     jl    .L4 #jump to body if i < n
-    mov    eax, DWORD PTR -4[rbp] #eax:= minimal
+    mov    eax, r12d #eax:= minimal
     pop    rbp
     ret #return minimal
     .size    find_min, .-find_min
@@ -68,11 +72,11 @@ main:
     mov    rsi, rax
     lea    rax, .LC0[rip] #rax :=&(string "%d")
     mov    rdi, rax #rdi := rax - first arg
-    mov    eax, 0 
+    mov    eax, 0
     call    __isoc99_scanf@PLT #scan n
     jmp    .L7 #jump to while loop condition
 .L8:
-    lea    rax, .LC1[rip] #rax=: string about mistake
+    lea    rax, .LC1[rip] #rax =: string about mistake
     mov    rdi, rax # rdi:=rax
     mov    eax, 0
     call    printf@PLT #print string about mistake
@@ -87,59 +91,59 @@ main:
     mov    eax, DWORD PTR -80020[rbp] #eax: = n
     test    eax, eax
     jle    .L8  #if less or equal go to the loop body
-    mov    eax, DWORD PTR -80020[rbp] #eax: = n 
+    mov    eax, DWORD PTR -80020[rbp] #eax: = n
     cmp    eax, 10000 #compare n and 10000
     jg    .L8 #if more than go to the loop body
-    mov    DWORD PTR -4[rbp], 0 #int i = 0
+    mov    r12d, 0 #int i = 0
     jmp    .L9 #go the the while loop condition
 
 .L10:
     lea    rdx, -40016[rbp] #arr
-    mov    eax, DWORD PTR -4[rbp] #i
+    mov    eax, r12d #i
     cdqe
     sal    rax, 2 #rotate bits
     add    rax, rdx
-    mov    rsi, rax 
+    mov    rsi, rax
     lea    rax, .LC0[rip] # string %d
     mov    rdi, rax
     mov    eax, 0
     call    __isoc99_scanf@PLT
-    add    DWORD PTR -4[rbp], 1 #i++
+    add    r12d, 1 #i++
 
 .L9:
     mov    eax, DWORD PTR -80020[rbp] #eax := n
-    cmp    DWORD PTR -4[rbp], eax #compare i and n
+    cmp    r12d, eax #compare i and n
     jl    .L10 # if less than n go to l10
     mov    edx, DWORD PTR -80020[rbp] #n
     lea    rax, -40016[rbp] #arr
     mov    esi, edx #n
     mov    rdi, rax #arr
     call    find_min #find_min(arr, n)
-    mov    DWORD PTR -12[rbp], eax #minimal = find_min(arr, n)
-    mov    DWORD PTR -8[rbp], 0 #int ans_size = 0
-    mov    DWORD PTR -4[rbp], 0 #i = 0
+    mov    r15d, eax #minimal = find_min(arr, n)
+    mov    r13d, 0 #int ans_size = 0
+    mov    r12d, 0 #i = 0
     jmp    .L11
 
 .L13:
-    mov    eax, DWORD PTR -4[rbp] #i = 0
+    mov    eax, r12d #i = 0
     cdqe
     mov    eax, DWORD PTR -40016[rbp+rax*4] #arr[i]
-    cmp    DWORD PTR -12[rbp], eax #compare minimal and arr[i]
+    cmp    r15d, eax #compare minimal and arr[i]
     je    .L12 #if arr[i] == minimal jump to the loop condition
-	mov	esi, eax
-	lea	rax, .LC0[rip]
-	mov	rdi, rax
-	mov	eax, 0
-	call	printf@PLT
-	mov	edi, 10
-	call	putchar@PLT
-	add	DWORD PTR -8[rbp], 1  #ans_size++
+      mov    esi, eax
+      lea    rax, .LC0[rip] #string %d
+      mov    rdi, rax
+      mov    eax, 0
+      call    printf@PLT #print arr[i]
+      mov    edi, 10
+      call    putchar@PLT #print "\n"
+      add    r13d, 1  #ans_size++
 .L12:
-	add	DWORD PTR -4[rbp], 1 #i++
+      add    r12d, 1 #i++
 .L11:
-	mov	eax, DWORD PTR -80020[rbp] #n
-	cmp	DWORD PTR -4[rbp], eax #copmare i and n
-	jl	.L13 # if i < n go to the body
-	mov	eax, 0
-	leave
-	ret #end
+    mov    eax, DWORD PTR -80020[rbp] #n
+    cmp    r12d, eax #compare i and n
+    jl    .L13 #if i < n go to the loop body
+    mov    eax, 0
+    leave
+    ret
